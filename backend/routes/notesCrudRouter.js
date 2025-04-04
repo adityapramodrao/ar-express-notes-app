@@ -110,14 +110,29 @@ NotesRounter.get("/getAllNotes", authenticateToken, async (req, res) => {
     }
 })
 
-NotesRounter.get("/deleteNotes/:noteId", authenticateToken, async (req, res) => {
-    const userId = req.params.noteId;
+NotesRounter.delete("/deleteNotes/:noteId", authenticateToken, async (req, res) => {
+    const noteId = req.params.noteId;
     const user = req.user;
 
     try {
-        
+        const note = await notesSchema.find({_id: noteId, userId: user._id});
+        if(!note){
+            return res.status(400).json({
+                error: true,
+                message: "Note not found!"
+            })
+        }
+        await notesSchema.deleteOne({_id: noteId, userId: user._id});
+
+        return res.json({
+            error: false,
+            message: "Note deleted Successfully"
+        })
     } catch (error) {
-        
+        return res.json({
+            error: true,
+            message: "Internal Server Error"
+        })
     }
 })
 

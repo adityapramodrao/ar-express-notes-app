@@ -36,3 +36,5 @@ export const PasswordInp = ({value, onChange, placeholder}) => {
 }
 
 export default PasswordInp;
+
+

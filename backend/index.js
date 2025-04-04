@@ -10,6 +10,7 @@ const mongoose = require("mongoose");                // MongoDB ODM (Object Data
 const Authrouter = require('./routes/Authrouter.js') // Authentication routes
 const { PORT, mongoDBURL } = require('./config.js'); // Extracting port and MongoDB URL from config
 const NotesRouter = require("./routes/notesCrudRouter.js");
+const PostRouter = require("./routes/postCrudRouter.js")
 
 
 // Initialize express app
@@ -28,6 +29,8 @@ app.use(cors({ origin: "*" }));
 app.use('/app', Authrouter);
 
 app.use('/notes', NotesRouter);
+
+app.use('/post', PostRouter);
 
 
 // Simple test route
