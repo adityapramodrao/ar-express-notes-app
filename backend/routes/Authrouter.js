@@ -4,47 +4,47 @@ const userModel = require("../models/user.model.js");
 
 const Authrouter = express.Router();
 
-// Create New account 
-Authrouter.post("/create-account", async (req, res) => {
-    console.log("Received Request Body:", req.body);
+    // Create New account 
+    Authrouter.post("/create-account", async (req, res) => {
+        console.log("Received Request Body:", req.body);
 
-    const { fullName, email, password } = req.body;
+        const { fullName, email, password } = req.body;
 
-    if (!fullName || !email || !password) {
-        return res.status(400).json({
-            error: true,
-            message: "Please provide fullName, email and password"
-        });
-    }
-
-    try {
-        const existingUser = await userModel.findOne({ email });
-        if (existingUser) {
+        if (!fullName || !email || !password) {
             return res.status(400).json({
                 error: true,
-                message: "Email already registered"
+                message: "Please provide fullName, email and password"
             });
         }
 
-        const newUser = new userModel({ fullName, email, password });
-        const result = await newUser.save();
+        try {
+            const existingUser = await userModel.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Email already registered"
+                });
+            }
 
-        const accessToken = jwt.sign({ id: result._id }, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: "36000m"
-        });
+            const newUser = new userModel({ fullName, email, password });
+            const result = await newUser.save();
 
-        return res.status(201).json({
-            error: false,
-            user: result,
-            token: accessToken,
-            message: "Registered successfully!"
-        });
+            const accessToken = jwt.sign({ id: result._id }, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: "36000m"
+            });
 
-    } catch (err) {
-        console.error(err.message);
-        return res.status(500).json({ error: true, message: "Server Error" });
-    }
-});
+            return res.status(201).json({
+                error: false,
+                user: result,
+                token: accessToken,
+                message: "Registered successfully!"
+            });
+
+        } catch (err) {
+            console.error(err.message);
+            return res.status(500).json({ error: true, message: "Server Error" });
+        }
+    });
 
 // Login API
 Authrouter.post("/login", async (req, res) => {
@@ -73,6 +73,7 @@ Authrouter.post("/login", async (req, res) => {
                 error: false,
                 message: "Login Successfully",
                 email,
+                fullName: userInfo.fullName,
                 accessToken,
             });
         } else {
